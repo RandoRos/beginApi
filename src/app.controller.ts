@@ -1,18 +1,15 @@
-import { Controller, Get, BadRequestException, Query } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Post, UseGuards, Request } from '@nestjs/common';
+import { AuthService } from './auth/auth.service';
+
+import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Get('auth')
-  authenticate(
-      @Query('email') name: string,
-      @Query('pw') password: string,
-  ) {
-      if (!name || !password) {
-          throw new BadRequestException();
-      }
-      return this.appService.authenticate(name, password);
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 }

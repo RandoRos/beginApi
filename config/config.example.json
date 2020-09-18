@@ -1,5 +1,8 @@
 {
     "password": {
         "hashRounds": 0
+    },
+    "jwt": {
+        "tokenSecret": "CHANGE_ME"
     }
 }
