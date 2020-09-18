@@ -1,40 +1,35 @@
-import { Injectable, UnauthorizedException, Get } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-export interface User {
-    id: number,
-    name: string,
-    password: string,
-    token: string,
-};
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UserService {
-    protected userDB: User[] = [];
-
-    getUser(token: string): User {
-        return this.userDB.find((user) => user.token === token);
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>
+    ) {}
+    
+    async getUser(id: number): Promise<User> {
+        return await this.userRepository.findOne(id);
     }
 
-    createUser(name: string, password: string): string {
-        const id = Math.floor(Math.random() * 999);
-        const token = this.generateToken(name, password)
-        this.userDB.push({
-            id,
+    async createUser(name: string, password: string): Promise<any> {
+        return await this.userRepository.insert({
             name,
             password,
-            token,
         });
-        return token;
     }
 
-    authenticate(name: string, password: string): string {
-        const token = this.generateToken(name, password);
-        const user = this.userDB.find((user) => user.token === token);
-        if (!user) {
-            throw new UnauthorizedException();
-        }
-        return user.token;
-    }
+    // authenticate(name: string, password: string): string {
+    //     const token = this.generateToken(name, password);
+    //     const user = this.userDB.find((user) => user.token === token);
+    //     if (!user) {
+    //         throw new UnauthorizedException();
+    //     }
+    //     return user.token;
+    // }
 
     private generateToken(name: string, password: string): string {
         return Buffer.from(name + password).toString('base64');

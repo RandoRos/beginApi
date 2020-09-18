@@ -5,14 +5,17 @@ import { TimeService } from './time.service';
 export class timeController {
     constructor(private readonly timeService: TimeService) {}
 
-    @Get()
-    getAll() {
-        return this.timeService.getAll();
+    @Get(':id')
+    getAll(@Param('id') id: number) {
+        return this.timeService.getAllUserTimes(id);
     }
 
-    @Get(':id')
-    getTime(@Param('id') id: number) {
-        return this.timeService.getTime(id);
+    @Get(':id/:timeId')
+    getTime(
+        @Param('id') id: number,
+        @Param('timeId') timeId: number,
+    ) {
+        return this.timeService.getTimeForUser(id, timeId);
     }
 
     @Post()

@@ -1,47 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-export interface Time {
-    id: number,
-    user: number,
-    title: string,
-    startTime: Date,
-    endTime?: Date,
-}
+import { Time } from '../entities/time.entity';
 
 @Injectable()
 export class TimeService {
-    private timeDB: Time[] = [];
+    constructor(
+        @InjectRepository(Time)
+        private readonly timeRepository: Repository<Time>,
+    ) {}
 
-    getAll() {
-        return this.timeDB.slice();
+    async getAllUserTimes(userId: number) {
+        return await this.timeRepository.find({ userId });
     }
 
-    getTime(id: number) {
-        const [timeRow] = this.findTimeRow(id);
-        return timeRow;
+    async getTimeForUser(id, userId) {
+        return await this.timeRepository.find({ id, userId });
     }
 
-    startTime(userId: number, title: string) {
-        const id = Math.floor(Math.random() * 9999);
-        this.timeDB.push({
-            id,
-            user: userId,
+    async startTime(userId: number, title: string) {
+        return await this.timeRepository.insert({
+            userId,
             title,
             startTime: new Date(),
         });
-        return id;
-    }
-
-    endStart(timeId: number) {
-        const 
-    }
-
-    private findTimeRow(id: number) {
-        const timeIndex = this.timeDB.findIndex((time) => time.id == id);
-        const timeRow = this.timeDB[timeIndex];
-        if (!timeRow) {
-            throw new NotFoundException();
-        }
-        return [timeRow, timeIndex];
     }
 }

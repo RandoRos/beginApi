@@ -1,13 +1,14 @@
 import { Controller, Get, Post, Body, Query, Param, BadRequestException } from '@nestjs/common';
-import { User, UserService } from './user.service';
+import { UserService } from './user.service';
+import { User } from '../entities/user.entity';
 
 @Controller('user')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get()
-    getUser(@Query('token') token: string): User {
-        return this.userService.getUser(token);
+    @Get(':id')
+    getUser(@Param('id') id: number): Promise<User> {
+        return this.userService.getUser(id);
     }
 
     @Post()
@@ -26,6 +27,7 @@ export class UserController {
         if (!name || !password) {
             throw new BadRequestException();
         }
-        return this.userService.authenticate(name, password);
+        // return this.userService.authenticate(name, password);
+        return 'hello';
     }
 }

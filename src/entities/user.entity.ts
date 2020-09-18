@@ -1,19 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Time {
+export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    user: number;
-
-    @Column('text')
-    title: string;
+    name: string;
 
     @Column()
-    startTime: Date;
-
-    @Column({ nullable: true })
-    endTime: Date;
+    password: string;
 }
