@@ -1,5 +1,14 @@
-import { Controller, Post, Get, Param, Body, UseGuards, Request } from '@nestjs/common';
-import { request } from 'https';
+import {
+    Controller,
+    Post,
+    Get,
+    Param,
+    Body,
+    UseGuards,
+    Request,
+    Patch
+} from '@nestjs/common';
+
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { TimeService } from './time.service';
 
@@ -23,11 +32,29 @@ export class timeController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post()
+    @Patch(':id')
+    editTime(
+        @Request() req,
+        @Param('id') timeId: number,
+        @Body() payload: any,
+    ) {
+        return this.timeService.editTime(req.user.userId, timeId, payload);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('create')
     createTime(
         @Request() req,
         @Body('title') title: string,
     ) {
         return this.timeService.startTime(req.user.userId, title);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('end')
+    endTime(
+        @Body('id') timeId: number,
+    ) {
+        return this.timeService.endTime(timeId);
     }
 }

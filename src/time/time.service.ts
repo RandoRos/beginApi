@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -11,12 +11,12 @@ export class TimeService {
         private readonly timeRepository: Repository<Time>,
     ) {}
 
-    async getAllUserTimes(userId: number) {
+    async getAllUserTimes(userId: number): Promise<Time[]>  {
         return await this.timeRepository.find({ userId });
     }
 
-    async getTimeForUser(id, userId) {
-        return await this.timeRepository.find({ id, userId });
+    async getTimeForUser(id, userId): Promise<Time> {
+        return await this.timeRepository.findOne({ id, userId });
     }
 
     async startTime(userId: number, title: string) {
@@ -25,5 +25,34 @@ export class TimeService {
             title,
             startTime: new Date(),
         });
+    }
+
+    async endTime(timeId: number) {
+        return await this.timeRepository.update(timeId, {
+            endTime: new Date(),
+        });
+    }
+
+    async editTime(userId: number, timeId: number, payload: Time) {
+        const userTime = await this.getTimeForUser(timeId, userId);
+        if (!userTime) {
+            throw new UnauthorizedException();
+        }
+        const updatedTime = { ...userTime };
+
+        if (payload.title) {
+            updatedTime.title = payload.title;
+        }
+        if (payload.startTime) {
+            // Check if start time is after endTime
+            updatedTime.startTime = payload.startTime;
+        }
+
+        if (payload.endTime) {
+            // Check if end time is before startTime 
+            updatedTime.endTime = payload.endTime;
+        }
+
+        return await this.timeRepository.update(timeId, updatedTime);
     }
 }
