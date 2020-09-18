@@ -6,7 +6,8 @@ import {
     Body,
     UseGuards,
     Request,
-    Patch
+    Patch,
+    Query,
 } from '@nestjs/common';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -18,8 +19,11 @@ export class timeController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    getAll(@Request() req) {
-        return this.timeService.getAllUserTimes(req.user.userId);
+    getAll(
+        @Request() req,
+        @Query('title') title: string,
+    ) {
+        return this.timeService.getAllUserTimes(req.user.userId, title);
     }
 
     @UseGuards(JwtAuthGuard)

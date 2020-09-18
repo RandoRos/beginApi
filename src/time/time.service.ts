@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Like } from 'typeorm';
 import { Repository } from 'typeorm';
 
 import { Time } from '../entities/time.entity';
@@ -11,8 +12,13 @@ export class TimeService {
         private readonly timeRepository: Repository<Time>,
     ) {}
 
-    async getAllUserTimes(userId: number): Promise<Time[]>  {
-        return await this.timeRepository.find({ userId });
+    async getAllUserTimes(userId: number, title?: string): Promise<Time[]>  {
+        // TODO SQL Injection
+        const searchParams = {
+            userId,
+            title: Like(`%${title || ''}%`),
+        };
+        return await this.timeRepository.find(searchParams);
     }
 
     async getTimeForUser(id, userId): Promise<Time> {
