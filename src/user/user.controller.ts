@@ -8,26 +8,11 @@ export class UserController {
 
     @Get(':id')
     getUser(@Param('id') id: number): Promise<User> {
-        return this.userService.getUser(id);
+        return this.userService.getUserById(id);
     }
 
     @Post()
-    addUser(
-        @Body('name') name: string,
-        @Body('password') password: string,
-    ) {
-        return this.userService.createUser(name, password);
-    }
-
-    @Get('auth')
-    authenticate(
-        @Query('name') name: string,
-        @Query('pw') password: string,
-    ) {
-        if (!name || !password) {
-            throw new BadRequestException();
-        }
-        // return this.userService.authenticate(name, password);
-        return 'hello';
+    addUser(@Body() user: User) {
+        return this.userService.createUser(user);
     }
 }
