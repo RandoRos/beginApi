@@ -21,10 +21,10 @@ This is a small TimeTracker API written in NestJS, that allows you to register a
   - `/:id`
     - `GET` Gets user specific time row (`id`)
     - `PATCH` - Allows to edit users specific time row (`id`)
+  - `/:id/end`
+    - `PATCH` - Ends user specific time row (`id`)
   - `/create`
     - `POST` - Allows to create new time for user. Requires `title` to be set in body.
-  - `/end`
-    - `PATCH` - Ends user specific time row. Requires time `id` to be set in body.
 
 **`root/user`** - User creation
   - `POST` - Allows to create user

@@ -55,10 +55,11 @@ export class timeController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Patch('end')
+    @Patch(':id/end')
     endTime(
-        @Body('id') timeId: number,
+        @Request() req,
+        @Param('id') timeId: number,
     ) {
-        return this.timeService.endTime(timeId);
+        return this.timeService.endTime(req.user.userId, timeId);
     }
 }

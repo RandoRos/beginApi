@@ -39,7 +39,11 @@ export class TimeService {
         });
     }
 
-    async endTime(timeId: number) {
+    async endTime(userId: number, timeId: number) {
+        const userTime = await this.getTimeForUser(timeId, userId);
+        if (!userTime) {
+            throw new UnauthorizedException();
+        }
         return await this.timeRepository.update(timeId, {
             endTime: new Date(),
         });
