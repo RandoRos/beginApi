@@ -1,7 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like } from 'typeorm';
 import { Repository } from 'typeorm';
+import moment from 'moment';
 
 import { Time } from '../entities/time.entity';
 
@@ -12,14 +12,19 @@ export class TimeService {
         private readonly timeRepository: Repository<Time>,
     ) {}
 
-    async getAllUserTimes(userId: number, title?: string): Promise<Time[]>  {
+    async getAllUserTimes(userId: number, title?: string): Promise<any>  {
          // potential SQL Injection
-        return await this.timeRepository
+        const rows = await this.timeRepository
             .createQueryBuilder('time')
             .where('time.userId = :id', { id: userId })
             .andWhere('time.title like :title', { title: `%${title || ''}%`})
             .orderBy('time.startTime', 'DESC')
             .getMany();
+        
+        return { 
+            times: rows, 
+            duration: this.getDuration(rows)
+        };
     }
 
     async getTimeForUser(id, userId): Promise<Time> {
@@ -51,15 +56,31 @@ export class TimeService {
             updatedTime.title = payload.title;
         }
         if (payload.startTime) {
-            // Check if start time is after endTime
+            if (moment(payload.startTime).isAfter(updatedTime.endTime)) {
+                throw new ForbiddenException('Start time has to be before end time');
+            }
             updatedTime.startTime = payload.startTime;
         }
 
         if (payload.endTime) {
-            // Check if end time is before startTime 
+            if (moment(payload.endTime).isBefore(updatedTime.startTime)) {
+                throw new ForbiddenException('End time has to be after start time');
+            }
             updatedTime.endTime = payload.endTime;
         }
 
         return await this.timeRepository.update(timeId, updatedTime);
+    }
+
+    private getDuration(times: Time[]): string {
+        const ms = times.reduce((duration, time) => {
+            if (time.endTime) {
+                duration += moment(time.endTime).diff(moment(time.startTime));
+            }
+            return duration;
+        }, 0);
+        
+        const duration = moment.duration(ms);
+        return Math.floor(duration.asHours()) + moment(ms).format(':mm:ss');
     }
 }
