@@ -14,6 +14,26 @@
 
 This is a small TimeTracker API written in NestJS, that allows you to register and authenticate users and track time.
 
+##### API main endpoints
+
+**`root/time (requires JTW)`** - Endpoint for manipulating time
+  - `GET` - Gets all authenticated users time rows
+  - `/:id`
+    - `GET` Gets user specific time row (`id`)
+    - `PATCH` - Allows to edit users specific time row (`id`)
+  - `/create`
+    - `POST` - Allows to create new time for user. Requires `title` to be set in body.
+  - `/end`
+    - `PATCH` - Ends user specific time row. Requires time `id` to be set in body.
+
+**`root/user`** - User creation
+  - `POST` - Allows to create user
+  - `/profile`
+    - `GET` - Gets authenticated user information (profile)
+
+**`root/auth/login`** - To authenticate user, which will produce JWT token
+  - `POST` - Requires correct username (email) and password.
+
 ## Installation
 
 ```bash
@@ -32,21 +52,6 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-
 
 ## License
 

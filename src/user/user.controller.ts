@@ -1,14 +1,17 @@
-import { Controller, Get, Post, Body, Query, Param, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
+
 import { UserService } from './user.service';
 import { User } from '../entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get(':id')
-    getUser(@Param('id') id: number): Promise<User> {
-        return this.userService.getUserById(id);
+    @UseGuards(JwtAuthGuard)
+    @Get('/profile')
+    getUser(@Req() req): Promise<User> {
+        return this.userService.getUserById(req.user.userId);
     }
 
     @Post()

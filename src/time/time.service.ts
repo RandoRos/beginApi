@@ -13,7 +13,7 @@ export class TimeService {
     ) {}
 
     async getAllUserTimes(userId: number, title?: string): Promise<Time[]>  {
-        // TODO SQL Injection
+        // TODO potential SQL Injection
         const searchParams = {
             userId,
             title: Like(`%${title || ''}%`),
