@@ -13,12 +13,13 @@ export class TimeService {
     ) {}
 
     async getAllUserTimes(userId: number, title?: string): Promise<Time[]>  {
-        // TODO potential SQL Injection
-        const searchParams = {
-            userId,
-            title: Like(`%${title || ''}%`),
-        };
-        return await this.timeRepository.find(searchParams);
+         // potential SQL Injection
+        return await this.timeRepository
+            .createQueryBuilder('time')
+            .where('time.userId = :id', { id: userId })
+            .andWhere('time.title like :title', { title: `%${title || ''}%`})
+            .orderBy('time.startTime', 'DESC')
+            .getMany();
     }
 
     async getTimeForUser(id, userId): Promise<Time> {
